@@ -1,9 +1,10 @@
 module github.com/unbearables/dev-tools
 
-go 1.21.5
+go 1.20
 
 require (
 	fyne.io/fyne/v2 v2.4.3
+	github.com/enescakir/emoji v1.0.0
 	github.com/google/uuid v1.6.0
 )
 

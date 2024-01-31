@@ -4,19 +4,20 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"github.com/enescakir/emoji"
 )
 
 func CreateJwtContent() *fyne.Container {
-	feedbackMsg := widget.NewLabel("🐌 Waiting for input")
+	feedbackMsg := widget.NewLabel(fmt.Sprintf("%v Waiting for input", emoji.Snail))
 
 	claimsField := widget.NewEntry()
 	claimsField.SetPlaceHolder("{}")
-	// claimsField.Disable()
 	claimsField.MultiLine = true
 	claimsField.Wrapping = fyne.TextWrapBreak
 
@@ -30,7 +31,7 @@ func CreateJwtContent() *fyne.Container {
 		}
 		jwtParts := strings.Split(s, ".")
 		if len(jwtParts) != 3 {
-			feedbackMsg.SetText("⚠️ Invalid JWT: incorrect number of part")
+			feedbackMsg.SetText(fmt.Sprintf("%v Invalid JWT: incorrect number of JWT parts", emoji.Warning))
 			return
 		}
 
@@ -40,14 +41,14 @@ func CreateJwtContent() *fyne.Container {
 			var prettyJson bytes.Buffer
 			err := json.Indent(&prettyJson, []byte(claimPart), "", "  ")
 			if err != nil {
-				feedbackMsg.SetText("⚠️ Invalid JWT: claims JSON is not valid")
+				feedbackMsg.SetText(fmt.Sprintf("%v Invalid JWT: claims JSON is not valid", emoji.Warning))
 				return
 			}
 
 			claimsField.SetText(string(prettyJson.Bytes()))
-			feedbackMsg.SetText("✅ Valid JWT")
+			feedbackMsg.SetText(fmt.Sprintf("%v Valid JWT", emoji.CheckMark))
 		} else {
-			feedbackMsg.SetText("⚠️ Invalid JWT: claims part not a valid base64")
+			feedbackMsg.SetText(fmt.Sprintf("%v Invalid JWT: claims part not a valid base64", emoji.Warning))
 		}
 	}
 
