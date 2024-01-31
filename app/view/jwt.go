@@ -16,8 +16,13 @@ import (
 func CreateJwtContent() *fyne.Container {
 	feedbackMsg := widget.NewLabel(fmt.Sprintf("%v Waiting for input", emoji.Snail))
 
+	headerField := widget.NewEntry()
+	headerField.SetPlaceHolder("header")
+	headerField.MultiLine = true
+	headerField.Wrapping = fyne.TextWrapBreak
+
 	claimsField := widget.NewEntry()
-	claimsField.SetPlaceHolder("{}")
+	claimsField.SetPlaceHolder("claims")
 	claimsField.MultiLine = true
 	claimsField.Wrapping = fyne.TextWrapBreak
 
@@ -35,9 +40,25 @@ func CreateJwtContent() *fyne.Container {
 			return
 		}
 
-		decodedStr, err := base64.StdEncoding.DecodeString(jwtParts[1] + "==")
+		headerDecodedStr, err := base64.StdEncoding.DecodeString(jwtParts[0])
 		if err == nil {
-			claimPart := string(decodedStr)
+			headerPart := string(headerDecodedStr)
+			var prettyJson bytes.Buffer
+			err := json.Indent(&prettyJson, []byte(headerPart), "", "  ")
+			if err != nil {
+				feedbackMsg.SetText(fmt.Sprintf("%v Invalid JWT: header JSON is not valid", emoji.Warning))
+				return
+			}
+
+			headerField.SetText(string(prettyJson.Bytes()))
+		} else {
+			feedbackMsg.SetText(fmt.Sprintf("%v Invalid JWT: header part not a valid base64", emoji.Warning))
+			return
+		}
+
+		claimsDecodedStr, err := base64.StdEncoding.DecodeString(jwtParts[1] + "==")
+		if err == nil {
+			claimPart := string(claimsDecodedStr)
 			var prettyJson bytes.Buffer
 			err := json.Indent(&prettyJson, []byte(claimPart), "", "  ")
 			if err != nil {
@@ -54,6 +75,6 @@ func CreateJwtContent() *fyne.Container {
 
 	return container.NewBorder(feedbackMsg, nil, nil, nil, container.NewGridWithColumns(2,
 		jwtField,
-		claimsField,
+		container.NewBorder(headerField, nil, nil, nil, claimsField),
 	))
 }
