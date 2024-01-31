@@ -1,6 +1,7 @@
 Website = "https://github.com/unbearables/dev-tools"
 
 [Details]
+  Icon = "icon.png"
   Name = "Dev tools"
   ID = "com.github.unbearables/dev-tools"
   Version = "0.1.0"
